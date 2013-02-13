@@ -1,0 +1,22 @@
+{
+    "name": "hpbuniat/parallely",
+    "description": "parallely",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "parallely",
+        "parallel execution"
+    ],
+    "authors": [
+        {
+            "name": "Hans-Peter Buniat",
+            "email": "hpbuniat@googlemail.com",
+            "role": "lead"
+        }
+    ],
+    "homepage": "https://github.com/hpbuniat/parallely",
+    "autoload": {
+        "psr-0": {
+            "parallely": ["src/", "tests/"]
+        }
+    }
+}
