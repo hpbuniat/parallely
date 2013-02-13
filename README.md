@@ -1,8 +1,7 @@
 parallely
 =====
 
-parallely is a re-usable component to do easy notifying, e.g. for status reports or updates.
-This is especially useful in cli applications where it's not longer necessary to continuously monitor the jobs output or to tail a log-file.
+parallely is a re-usable component to do parallel-processing with php.
 
 Builtin transports
 -----
