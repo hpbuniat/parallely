@@ -49,11 +49,20 @@ abstract class TestAbstract extends \PHPUnit_Framework_TestCase {
     public function testAll() {
         $sTestVal = uniqid();
         $sTestKey = (int) microtime(true);
+        $sTestTestKey = md5($sTestKey);
 
         $this->assertFalse($this->_object->read($sTestKey));
         $this->assertInstanceOf($this->_sTestClass, $this->_object->write($sTestKey, $sTestVal));
+        $this->assertInstanceOf($this->_sTestClass, $this->_object->write($sTestTestKey, $sTestVal));
         $this->assertEquals($sTestVal, $this->_object->read($sTestKey));
+
+        $this->assertInstanceOf($this->_sTestClass, $this->_object->delete($sTestKey));
+
+        $this->assertFalse($this->_object->read($sTestKey));
+        $this->assertEquals($sTestVal, $this->_object->read($sTestTestKey));
+
         $this->assertInstanceOf($this->_sTestClass, $this->_object->free());
+        $this->assertFalse($this->_object->read($sTestTestKey));
     }
 
     /**

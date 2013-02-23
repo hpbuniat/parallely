@@ -87,6 +87,17 @@ class Xcache extends \parallely\AbstractTransport implements \parallely\Transpor
 
     /**
      * (non-PHPdoc)
+     * @see \parallely\TransportInterface::delete()
+     */
+    public function delete($sId) {
+        $this->_prepare();
+        xcache_unset(self::PREFIX . $sId);
+
+        return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see \parallely\TransportInterface::free()
      */
     public function free() {

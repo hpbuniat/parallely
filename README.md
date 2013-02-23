@@ -3,6 +3,29 @@ parallely
 
 parallely is a re-usable component to do parallel-processing with php.
 
+Example Setup
+-----
+<pre>
+"parallel": {
+    "adapter": "sharedmemory",
+    "config": {
+        "path": "/tmp",
+        "host": "localhost",
+        "port": 11211
+    }
+}
+</pre>
+
+<pre>
+$oParallel = \parallely\Builder::build($aStack, $oConfig->adapter, $oConfig->config);
+$oParallel->run(array(
+    'check' => array(
+        $iTime
+    ),
+    'run'
+));
+</pre>
+
 Builtin transports
 -----
 

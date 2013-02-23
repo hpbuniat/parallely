@@ -60,6 +60,20 @@ class Execute {
     private $_aStack = array();
 
     /**
+     * The stack-size
+     *
+     * @var int
+     */
+    private $_iSize = 0;
+
+    /**
+     * The number of finished threads
+     *
+     * @var int
+     */
+    private $_iFinished = 0;
+
+    /**
      * Running processes
      *
      * @var array
@@ -88,6 +102,13 @@ class Execute {
     private $_oTransport = null;
 
     /**
+     * A callback, which is executed in the wait-gap
+     *
+     * @var callable
+     */
+    private $_mCallback;
+
+    /**
      * Number of threads (default)
      *
      * @var array
@@ -101,7 +122,6 @@ class Execute {
      * @param TransportInterface $oTransport
      */
     public function __construct(array $aStack = array(), TransportInterface $oTransport) {
-        $this->_iStart = microtime(true);
         $this->_aStack = array();
 
         // convert stack to array with numeric keys
@@ -132,6 +152,21 @@ class Execute {
      */
     public function getTransport() {
         return $this->_oTransport;
+    }
+
+    /**
+     * Set the callback
+     *
+     * @param  callable $mCallback
+     *
+     * @return $this
+     */
+    public function setCallback($mCallback) {
+        if (is_callable($mCallback) === true) {
+            $this->_mCallback = $mCallback;
+        }
+
+        return $this;
     }
 
     /**
@@ -169,6 +204,20 @@ class Execute {
     }
 
     /**
+     * Get the execution stats
+     *
+     * @return array
+     */
+    public function getStats() {
+        return array(
+            'started' => $this->_iStart,
+            'total' => $this->_iSize,
+            'running' => count($this->_aProc),
+            'finished' => $this->_iFinished
+        );
+    }
+
+    /**
      * Run
      *
      * @param  array $aMethods Methods to execute
@@ -176,6 +225,7 @@ class Execute {
      * @return $this
      */
     public function run(array $aMethods = array()) {
+        $this->_iStart = microtime(true);
         if (count($this->_aStack) === 1 or $this->_iThreads === 1) {
             $this->_execute($aMethods, key($this->_aStack));
         }
@@ -243,6 +293,7 @@ class Execute {
      * @return $this
      */
     private function _wait($bAll = false) {
+        $iChildren = 0;
         do {
             $iStatus = null;
             $iPid = pcntl_waitpid(-1, $iStatus, WNOHANG);
@@ -258,7 +309,11 @@ class Execute {
                 usleep(10000);
             }
 
-            $iChildren = count($this->_aProc);
+            $aStats = $this->getStats();
+            $iChildren = $aStats['running'];
+            if (empty($this->_mCallback) !== true) {
+                call_user_func($this->_mCallback, $aStats);
+            }
         }
         while ($iChildren > 0 and $bAll === true);
 
@@ -275,6 +330,8 @@ class Execute {
             $mResult = $this->_oTransport->read($iStack);
             if (empty($mResult) !== true) {
                 $this->_aStack[$iStack] = unserialize(gzuncompress($mResult));
+                $this->_oTransport->delete($iStack);
+                $this->_iFinished++;
             }
         }
 

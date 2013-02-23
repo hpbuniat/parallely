@@ -107,10 +107,10 @@ class SharedMemory extends \parallely\AbstractTransport implements \parallely\Tr
     public function read($sId) {
         $mReturn = false;
         $this->_prepare();
+        $sId = crc32($sId);
 
-        if (shm_has_var($this->_rShared, $sId) === true) {
+        if (empty($this->_rShared) !== true and shm_has_var($this->_rShared, $sId) === true) {
             $mReturn = shm_get_var($this->_rShared, $sId);
-            shm_remove_var($this->_rShared, $sId);
         }
 
         return $mReturn;
@@ -122,8 +122,27 @@ class SharedMemory extends \parallely\AbstractTransport implements \parallely\Tr
      */
     public function write($sId, $mData) {
         $this->_prepare();
+        $sId = crc32($sId);
 
-        shm_put_var($this->_rShared, $sId, $mData);
+        if (empty($this->_rShared) !== true) {
+            shm_put_var($this->_rShared, $sId, $mData);
+        }
+
+        return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \parallely\TransportInterface::delete()
+     */
+    public function delete($sId) {
+        $this->_prepare();
+        $sId = crc32($sId);
+
+        if (empty($this->_rShared) !== true and shm_has_var($this->_rShared, $sId) === true) {
+            shm_remove_var($this->_rShared, $sId);
+        }
+
         return $this;
     }
 
@@ -146,6 +165,7 @@ class SharedMemory extends \parallely\AbstractTransport implements \parallely\Tr
         }
 
         rmdir($this->_sDirectory);
+        unset($this->_rShared);
 
         return $this;
     }

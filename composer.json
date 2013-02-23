@@ -18,5 +18,13 @@
         "psr-0": {
             "parallely": ["src/", "tests/"]
         }
+    },
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "suggest": {
+        "ext-xcache": "*",
+        "ext-apc": "*",
+        "ext-memcached": ">=1.0.0"
     }
 }

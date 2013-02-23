@@ -73,7 +73,7 @@ interface TransportInterface {
     public function read($sId);
 
     /**
-     * Setup the transport
+     * Write a value to the transport
      *
      * @param  string $sId
      * @param  mixed $mData
@@ -81,6 +81,15 @@ interface TransportInterface {
      * @return TransportInterface
      */
     public function write($sId, $mData);
+
+    /**
+     * Delete an entry
+     *
+     * @param  string $sId
+     *
+     * @return TransportInterface
+     */
+    public function delete($sId);
 
     /**
      * Release the transport & cleanup

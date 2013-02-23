@@ -121,6 +121,17 @@ class File extends \parallely\AbstractTransport implements \parallely\TransportI
 
     /**
      * (non-PHPdoc)
+     * @see \parallely\TransportInterface::delete()
+     */
+    public function delete($sId) {
+        $this->_prepare();
+        unlink($this->_sDirectory . DIRECTORY_SEPARATOR . self::PREFIX . $sId);
+
+        return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see \parallely\TransportInterface::free()
      */
     public function free() {

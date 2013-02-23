@@ -103,9 +103,21 @@ class Memcached extends \parallely\AbstractTransport implements \parallely\Trans
 
     /**
      * (non-PHPdoc)
+     * @see \parallely\TransportInterface::delete()
+     */
+    public function delete($sId) {
+        $this->_prepare()->_oMemcache->delete($sId);
+
+        return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see \parallely\TransportInterface::free()
      */
     public function free() {
+        $this->_prepare()->_oMemcache->flush();
+
         return $this;
     }
 }

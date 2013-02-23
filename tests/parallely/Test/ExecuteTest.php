@@ -37,6 +37,7 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         $oTransport->expects($this->any())->method('write')->will($this->returnSelf());
         $oTransport->expects($this->any())->method('free')->will($this->returnSelf());
 
+
         $this->_object = new \parallely\Execute($aStack, $oTransport);
     }
 
@@ -59,6 +60,11 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         foreach ($aStack as $oItem) {
             $this->assertInstanceOf(self::TEST_MOCK, $oItem);
         }
+
+        $aStats = $this->_object->getStats();
+        $this->assertEquals(4, $aStats['total']);
+        $this->assertEquals(4, $aStats['finished']);
+        $this->assertEquals(0, $aStats['running']);
     }
 
     /**
