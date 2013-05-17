@@ -42,6 +42,13 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Teardown
+     */
+    public function tearDown() {
+        unset($this->_object);
+    }
+
+    /**
      * Test the complete workflow
      */
     public function testWorkflow() {
@@ -49,6 +56,12 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(\parallely\Execute::THREADS, $this->_object->getThreads());
         $this->assertInstanceOf('\\parallely\\Execute', $this->_object->threads(2));
         $this->assertEquals(2, $this->_object->getThreads());
+
+
+        $aStats = $this->_object->getStats();
+        $this->assertEquals(3, $aStats['total']);
+        $this->assertEquals(0, $aStats['finished']);
+        $this->assertEquals(0, $aStats['running']);
 
         $this->assertInstanceOf('\\parallely\\Execute', $this->_object->run(array(
             'free'
@@ -62,8 +75,8 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         }
 
         $aStats = $this->_object->getStats();
-        $this->assertEquals(4, $aStats['total']);
-        $this->assertEquals(4, $aStats['finished']);
+        $this->assertEquals(3, $aStats['total']);
+        $this->assertEquals(3, $aStats['finished']);
         $this->assertEquals(0, $aStats['running']);
     }
 

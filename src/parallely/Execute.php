@@ -60,13 +60,6 @@ class Execute {
     private $_aStack = array();
 
     /**
-     * The stack-size
-     *
-     * @var int
-     */
-    private $_iSize = 0;
-
-    /**
      * The number of finished threads
      *
      * @var int
@@ -121,7 +114,7 @@ class Execute {
      * @param array $aStack
      * @param TransportInterface $oTransport
      */
-    public function __construct(array $aStack = array(), TransportInterface $oTransport) {
+    public function __construct(array $aStack = array(), TransportInterface $oTransport = null) {
         $this->_aStack = array();
 
         // convert stack to array with numeric keys
@@ -130,7 +123,7 @@ class Execute {
         }
 
         $this->_oTransport = $oTransport;
-        $this->threads();
+        $this->threads(($oTransport instanceof TransportInterface) ? self::THREADS : 1);
     }
 
     /**
@@ -211,10 +204,33 @@ class Execute {
     public function getStats() {
         return array(
             'started' => $this->_iStart,
-            'total' => $this->_iSize,
+            'total' => count($this->_aStack),
             'running' => count($this->_aProc),
-            'finished' => $this->_iFinished
+            'finished' => $this->_iFinished,
+            'threads' => $this->_iThreads
         );
+    }
+
+    /**
+     * Reset the stats
+     *
+     * @return $this
+     */
+    public function resetStats() {
+        $this->_iStart = microtime(true);
+        $this->_iFinished = 0;
+        return $this;
+    }
+
+    /**
+     * Reset the executor
+     *
+     * @return $this
+     */
+    public function reset() {
+        $this->_aStack = $this->_aProc = array();
+        $this->resetStats();
+        return $this;
     }
 
     /**
@@ -225,8 +241,9 @@ class Execute {
      * @return $this
      */
     public function run(array $aMethods = array()) {
-        $this->_iStart = microtime(true);
-        if (count($this->_aStack) === 1 or $this->_iThreads === 1) {
+        $this->resetStats();
+
+        if (count($this->_aStack) === 1 or $this->_iThreads === 1 or ($this->_oTransport instanceof TransportInterface) === false) {
             $this->_execute($aMethods, key($this->_aStack));
         }
         else {
@@ -302,6 +319,7 @@ class Execute {
                 if ($iChild === $iPid) {
                     unset($this->_aProc[$sChild]);
                     $bUnset = true;
+                    $this->_iFinished++;
                 }
             }
 
@@ -331,7 +349,6 @@ class Execute {
             if (empty($mResult) !== true) {
                 $this->_aStack[$iStack] = unserialize(gzuncompress($mResult));
                 $this->_oTransport->delete($iStack);
-                $this->_iFinished++;
             }
         }
 

@@ -63,7 +63,13 @@ class Builder {
      * @return Execute
      */
     public static function build(array $aStack, $mAdapter, $mConfig = null) {
-        $oTransport = self::transport($mAdapter, $mConfig);
+        try {
+            $oTransport = self::transport($mAdapter, $mConfig);
+        }
+        catch (Exception $oBuildException) {
+            $oTransport = null;
+        }
+
         return new Execute($aStack, $oTransport);
     }
 
