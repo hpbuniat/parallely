@@ -35,6 +35,10 @@ Builtin transports
 - XCache
 - APC
 
+Note
+-----
+With empty or invalid configuration, parallely will process all stacks sequentially.
+
 Extending
 -----
 You may add own adapters by simply implementing the TransportInterface.
