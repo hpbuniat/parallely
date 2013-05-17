@@ -10,18 +10,23 @@ class BuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @dataProvider transportProvider
      */
-    public function testBuild($sTransport, $aConfig) {
+    public function testBuild($sTransport, $aConfig = array()) {
         $oExecute = \parallely\Builder::build(array(), $sTransport, $aConfig);
         $this->assertInstanceOf('\\parallely\\Execute', $oExecute);
-        $this->assertInstanceOf('\\parallely\\TransportInterface', $oExecute->getTransport());
+
+        if (empty($sTransport) !== true) {
+            $this->assertInstanceOf('\\parallely\\TransportInterface', $oExecute->getTransport());
+        }
     }
 
     /**
      * @dataProvider transportProvider
      */
-    public function testTransport($sTransport, $aConfig) {
+    public function testTransport($sTransport, $aConfig = array()) {
         $oTransport = \parallely\Builder::transport($sTransport, $aConfig);
-        $this->assertInstanceOf('\\parallely\\TransportInterface', $oTransport);
+        if (empty($sTransport) !== true) {
+            $this->assertInstanceOf('\\parallely\\TransportInterface', $oTransport);
+        }
     }
 
     /**
@@ -57,6 +62,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase {
             array(
                 'apc',
                 array()
+            ),
+            array(
+                null
             )
         );
     }
@@ -64,9 +72,8 @@ class BuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * Test that a unknown transport throws an exception
      */
-    public function testTransportException() {
-        $this->setExpectedException('\\parallely\\Exception', \parallely\Exception::UNKNOWN_TRANSPORT);
-        \parallely\Builder::transport('blafasel');
+    public function testEmptyTransport() {
+        $this->assertNull(\parallely\Builder::transport('blafasel'));
     }
 
     /**

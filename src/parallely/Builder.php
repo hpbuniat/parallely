@@ -122,7 +122,8 @@ class Builder {
         }
 
         if (($oTransport instanceof TransportInterface) !== true) {
-            throw new Exception(Exception::UNKNOWN_TRANSPORT);
+            //throw new Exception(Exception::UNKNOWN_TRANSPORT);
+            $oTransport = null;
         }
 
         return $oTransport;
