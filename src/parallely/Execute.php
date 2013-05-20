@@ -129,11 +129,11 @@ class Execute {
     /**
      * Set the transport
      *
-     * @param  TransportInterface $oTransport
+     * @param  TransportInterface|null $oTransport
      *
      * @return $this
      */
-    public function setTransport(TransportInterface $oTransport) {
+    public function setTransport(TransportInterface $oTransport = null) {
         $this->_oTransport = $oTransport;
         return $this;
     }
@@ -141,7 +141,7 @@ class Execute {
     /**
      * Get the transport
      *
-     * @return TransportInterface
+     * @return TransportInterface|null
      */
     public function getTransport() {
         return $this->_oTransport;
@@ -244,7 +244,10 @@ class Execute {
         $this->resetStats();
 
         if (count($this->_aStack) === 1 or $this->_iThreads === 1 or ($this->_oTransport instanceof TransportInterface) === false) {
-            $this->_execute($aMethods, key($this->_aStack));
+            foreach (array_keys($this->_aStack) as $iStack) {
+                $this->_execute($aMethods, $iStack);
+                $this->_iFinished++;
+            }
         }
         else {
             foreach (array_keys($this->_aStack) as $iStack) {

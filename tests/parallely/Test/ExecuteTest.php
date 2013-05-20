@@ -37,7 +37,6 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         $oTransport->expects($this->any())->method('write')->will($this->returnSelf());
         $oTransport->expects($this->any())->method('free')->will($this->returnSelf());
 
-
         $this->_object = new \parallely\Execute($aStack, $oTransport);
     }
 
@@ -57,7 +56,39 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\\parallely\\Execute', $this->_object->threads(2));
         $this->assertEquals(2, $this->_object->getThreads());
 
+        $this->workflowAsserts();
+    }
 
+    /**
+     * Test with a single thread
+     */
+    public function testSingle() {
+        $this->_object->getTransport()->read(md5(time()));
+
+        $this->assertInstanceOf('\\parallely\\Execute', $this->_object->threads(1));
+        $this->assertEquals(1, $this->_object->getThreads());
+
+        $this->workflowAsserts();
+    }
+
+    /**
+     * Test setting a transport
+     */
+    public function testSetTransport() {
+        $this->_object->getTransport()->read(md5(time()));
+
+        $this->assertInstanceOf('\\parallely\\Execute', $this->_object->setTransport(null));
+        $this->assertNull($this->_object->getTransport());
+
+        $this->workflowAsserts();
+    }
+
+    /**
+     * common asserts
+     *
+     * @return void
+     */
+    public function workflowAsserts() {
         $aStats = $this->_object->getStats();
         $this->assertEquals(3, $aStats['total']);
         $this->assertEquals(0, $aStats['finished']);
@@ -78,37 +109,5 @@ class ExecuteTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(3, $aStats['total']);
         $this->assertEquals(3, $aStats['finished']);
         $this->assertEquals(0, $aStats['running']);
-    }
-
-    /**
-     * Test with a single thread
-     */
-    public function testSingle() {
-        $this->_object->getTransport()->read(md5(time()));
-
-        $this->assertInstanceOf('\\parallely\\Execute', $this->_object->threads(1));
-        $this->assertEquals(1, $this->_object->getThreads());
-
-        $this->assertInstanceOf('\\parallely\\Execute', $this->_object->run(array(
-            'free'
-        )));
-
-        $aStack = $this->_object->get();
-        $this->assertInternalType('array', $aStack);
-        $this->assertEquals(3, count($aStack));
-        foreach ($aStack as $oItem) {
-            $this->assertInstanceOf(self::TEST_MOCK, $oItem);
-        }
-    }
-
-    /**
-     * Test setting a transport
-     */
-    public function testSetTransport() {
-        $this->_object->getTransport()->read(md5(time()));
-
-        $oMock = $this->getMock(self::TEST_MOCK);
-        $this->assertInstanceOf('\\parallely\\Execute', $this->_object->setTransport($oMock));
-        $this->assertEquals($oMock, $this->_object->getTransport());
     }
 }
